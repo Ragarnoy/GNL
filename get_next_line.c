@@ -6,7 +6,7 @@
 /*   By: tlernoul <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/20 21:28:37 by tlernoul          #+#    #+#             */
-/*   Updated: 2017/09/28 23:10:24 by tlernoul         ###   ########.fr       */
+/*   Updated: 2017/09/28 23:27:24 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 
 int		get_next_line(const int fd, char **line)
 {
-	char str[BUFF_SIZE + 1];
+	static char str[BUFF_SIZE + 1];
+	char	*tmp;
 	int i;
 	int end;
 
@@ -24,8 +25,11 @@ int		get_next_line(const int fd, char **line)
 	{
 		str[BUFF_SIZE] = '\0';
 		*line = ft_strappend(*line, str, 'f');
-		if (ft_strchr(str, '\n'))
+		if ((tmp = ft_strchr(*line, '\n')))
+		{
+			*tmp = '\0';
 			return (1);
+		}
 	}
 	return (0);
 }
