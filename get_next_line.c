@@ -6,46 +6,43 @@
 /*   By: tlernoul <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/20 21:28:37 by tlernoul          #+#    #+#             */
-/*   Updated: 2017/10/02 19:15:30 by tlernoul         ###   ########.fr       */
+/*   Updated: 2017/10/03 19:07:39 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdio.h>
-char	*findnewline_cut(char *str)
-{
-	char	*ret;
 
-	ret = ft_strnew(BUFF_SIZE);
-	if (!(ft_strchr(str, '\n')))
-		return (NULL);
-	else
-	{
-		ret = ft_memmove(str, ft_strchr(str, '\n') + 1, ft_strclen(str, '\n'));
-		ft_bzero(ft_strchr(str, '\n'), ft_strlen(ft_strchr(str, '\n')));
-	}
-		//printf("=+%s+=\n", str);
-	return (ret);
+void	newline(char *str, char *line)
+{
+	size_t	i;
+	char	*p;
+
+	p = ft_strchr(str, '\n');
+	i = str + ft_strlen(str) - p;
+	ft_memcpy(line, str, i);
+	line[i] = '\0';
+	ft_memmove(str, p + 1, i);
 }
 
 int		get_next_line(const int fd, char **line)
 {
 	static char	*str = NULL;
-	char		*tmp;
 	int			end;
 
-	if (!str && !(str = ft_strnew(BUFF_SIZE)))
+	if (/*!str &&*/!(str = ft_strnew(BUFF_SIZE)))
 		return (0);
 	while ((end = read(fd, str, BUFF_SIZE)) > 0)
 	{
-		tmp = ft_strnew(BUFF_SIZE);
-		tmp = ft_strappend(*line, str, 'f');
-		ft_bzero(str, BUFF_SIZE);
-		if (findnewline_cut(tmp))
-		{
+		if (!line && str)
 			*line = ft_strappend(*line, str, 'f');
+		if (!ft_strchr(str, '\n'))
+		{
+			newline(str, *line);
 			return (1);
 		}
+		else
+			*line = ft_strappend(*line, str, 'f');
 	}
 	if (!line && !end)
 		free(str);
