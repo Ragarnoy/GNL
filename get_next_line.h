@@ -6,7 +6,7 @@
 /*   By: tlernoul <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/20 21:21:51 by tlernoul          #+#    #+#             */
-/*   Updated: 2017/10/02 14:44:16 by tlernoul         ###   ########.fr       */
+/*   Updated: 2017/10/05 23:24:56 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,13 @@
 # include <unistd.h>
 # include "libft/libft.h"
 # include <string.h>
+
+typedef struct		s_gnl
+{
+	void			*content;
+	size_t			content_size;
+	struct s_gnl	*next;
+}					t_gnl;
 
 int	get_next_line(const int fd, char **line);
 
