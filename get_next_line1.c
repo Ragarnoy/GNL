@@ -6,7 +6,7 @@
 /*   By: tlernoul <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/20 21:28:37 by tlernoul          #+#    #+#             */
-/*   Updated: 2017/10/15 19:58:08 by tlernoul         ###   ########.fr       */
+/*   Updated: 2017/10/16 17:49:25 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,14 +19,19 @@ int		get_next_line(const int fd, char **line)
 	char		*buffer;
 	int			end;
 
+	*line = NULL;
 	buffer = ft_strnew(BUFF_SIZE + 1);
 	while ((end = read(fd, buffer, BUFF_SIZE)) > 0 && (!ft_strchr(buffer, '\n')))
 	{
 		if (save)
-			*line = ft_strappend(*line, save, 'f');
+		{
+			*line = ft_strappend(*line, save, 'n');
+			ft_strdel(&save);
+		}
 		if (buffer[0])
+		{
 			*line = ft_strappend(*line, buffer, 'f');
-		ft_strdel(&save);
+		}
 	}
 	if (ft_strchr(buffer, '\n'))
 	{
@@ -34,7 +39,7 @@ int		get_next_line(const int fd, char **line)
 		save = ft_strsub(buffer, ft_strchr(buffer, '\n') - buffer + 1, ft_strclenc(buffer, '\n', '\0'));
 	}
 	else
-		*line = ft_strappend(*line, buffer, 'f');
+		*line = ft_strappend(*line, buffer, 'n');
 	ft_strdel(&buffer);
 	if (!end)
 		return (0);
