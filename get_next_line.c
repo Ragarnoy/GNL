@@ -6,68 +6,51 @@
 /*   By: tlernoul <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/20 21:28:37 by tlernoul          #+#    #+#             */
-/*   Updated: 2017/10/14 19:33:06 by tlernoul         ###   ########.fr       */
+/*   Updated: 2017/10/23 18:25:30 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdio.h>
 
-void	newline(char *str, char *line, char **save)
+void	concaten(char **save, char **line)
 {
-	size_t	i;
-	char	*p;
-
-//printf("--------\nDebug 1 \n>>> line=%s %zu\n>>>> str=%s %zu\n--------\n",line,ft_strlen(line),str,ft_strlen(str));
-	p = ft_strchr(str, '\n');
-	i = (str + ft_strlen(str)) - p;
-	if (str[0] == '\n' && str[1] != '\n')
+	if (save)
 	{
-		ft_memmove(str, str + 1, i);
-		*save = ft_strdup(p);
-		return ;
+		*line = ft_strappend(*line, *save, 'n');
+		ft_strdel(save);
 	}
-	if (p[0] == '\n' && p[1] == '\n')
-		line = ft_strappend(line, "\n", 'f');
-	*p = '\0';
-	*save = ft_strdup(p + 1);
-	line = ft_strappend(line, str, 'f');
-//printf("--------\nDebug 2 \n>>> line=%s %zu\n>>> *save=%s %zu\n--------\n",line,ft_strlen(line),*save,ft_strlen(*save));
 }
 
 int		get_next_line(const int fd, char **line)
 {
 	static char	*save = NULL;
-	char		buffer[BUFF_SIZE + 1];
+	char		*buffer;
 	int			end;
 
-	*line = ft_strnew(BUFF_SIZE); //lol je sais pas
-	ft_bzero(buffer, BUFF_SIZE + 1);
-	while ((end = read(fd, buffer, BUFF_SIZE)) >= 0 && 
-			(!ft_strchr(buffer, '\n')))
+	*line = NULL;
+	buffer = ft_strnew(BUFF_SIZE + 1);
+	while ((end = read(fd, buffer, BUFF_SIZE)) > 0 && (!ft_strchr(buffer, '\n')))
 	{
-//printf("--------\nDebug 0 \n>>> line=%s %zu\n>>>> str=%s %zu\n--------\n\n",*line,ft_strlen(*line),buffer,ft_strlen(buffer));
-		if (save)
-		{
-			//ft_putstr("fucktard\n");
-			*line = ft_strappend(*line, save, 'f');
-		}
+		concaten(&save, line);
 		if (buffer[0])
-		{
-			//ft_putstr("fucktardo\n");
 			*line = ft_strappend(*line, buffer, 'f');
-		}
-			//ft_putstr("fucktardus\n");
-		ft_strdel(&save);
 	}
-		newline (buffer, *line, &save);
-//printf("--------\nSortie NL \n>>> line=%s %zu\n>>>> str=%s %zu\n--------\n\n",*line,ft_strlen(*line),buffer,ft_strlen(buffer));
-	if (!end)
+	if (ft_strchr(buffer, '\n'))
 	{
-		//printf("str is free\n");
-		return (0);
+		concaten(&save, line);
+		*line = ft_strappend(*line, ft_strsub(buffer, 0, ft_strchr(buffer, '\n') - buffer), 'f');
+		save = ft_strsub(buffer, ft_strchr(buffer, '\n') - buffer + 1, ft_strclenc(buffer, '\n', '\0'));
 	}
-	return (1);
+	else if (end)
+		*line = ft_strappend(*line, buffer, 'n');
+	ft_strdel(&buffer);
+	if (!end && save)
+	{
+		concaten(&save, line);
+		return (42);
+	}
+	return (end || (line && line[0]));
 }
 
 #include <fcntl.h>
@@ -75,14 +58,17 @@ int main(int argc, const char *argv[])
 {
 	char	*line;
 	int		fd;
+	int		ret;
 
 	fd = 0;
 	if (argc == 2)
 		fd = open(argv[1], O_RDONLY);
-	while (get_next_line(fd, &line) > 0)
+	while ((ret = get_next_line(fd, &line) > 0))
 	{
+		//ft_putnbr(ret);
+		//ft_putstr(": ");
 		ft_putendl(line);
-		//printf(" %zu\n", ft_strlen(line));
+	//	printf("   ||>>  %zu\n",ft_strlen(line));
 		free(line);
 	}
 	line = NULL;
