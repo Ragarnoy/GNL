@@ -6,7 +6,7 @@
 /*   By: tlernoul <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/20 21:28:37 by tlernoul          #+#    #+#             */
-/*   Updated: 2017/10/23 18:25:30 by tlernoul         ###   ########.fr       */
+/*   Updated: 2017/10/24 20:38:06 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,13 @@
 
 void	concaten(char **save, char **line)
 {
-	if (save)
+	if (*save)
 	{
+		printf("1===line: %s ||save: %s||\n", *line, *save);
 		*line = ft_strappend(*line, *save, 'n');
+		printf("2===line: %s ||save: %s||\n", *line, *save);
 		ft_strdel(save);
+		printf("3===line: %s ||save: %s||\n", *line, *save);
 	}
 }
 
@@ -36,11 +39,16 @@ int		get_next_line(const int fd, char **line)
 		if (buffer[0])
 			*line = ft_strappend(*line, buffer, 'f');
 	}
+	if (end == -1)
+		return (-1);
 	if (ft_strchr(buffer, '\n'))
 	{
 		concaten(&save, line);
+		ft_putendl(buffer);
 		*line = ft_strappend(*line, ft_strsub(buffer, 0, ft_strchr(buffer, '\n') - buffer), 'f');
+		printf("%zu\n", ft_strclenc(buffer, '\n', '\0'));
 		save = ft_strsub(buffer, ft_strchr(buffer, '\n') - buffer + 1, ft_strclenc(buffer, '\n', '\0'));
+		printf("===line: %s ||save: %s||\n", *line, save);
 	}
 	else if (end)
 		*line = ft_strappend(*line, buffer, 'n');
