@@ -6,7 +6,7 @@
 /*   By: tlernoul <tlernoul@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/24 20:39:50 by tlernoul          #+#    #+#             */
-/*   Updated: 2017/10/31 18:37:35 by tlernoul         ###   ########.fr       */
+/*   Updated: 2017/10/31 19:25:41 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,9 @@ int		ft_get_next_line(const int fd, char **line)
 	static t_gnl	gnl;
 	char			*buffer;
 
+	if (fd < 0 || fd > MAX_FD || line == NULL || BUFF_SIZE <= 0 ||
+			BUFF_SIZE > MAX_INT || !(buffer = ft_strnew(BUFF_SIZE + 1)))
+		return (-1);
 	*line = NULL;
 	while ((gnl.end = read(fd, buffer, BUFF_SIZE)) > 0)
 	{
