@@ -6,40 +6,69 @@
 /*   By: tlernoul <tlernoul@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/24 20:39:50 by tlernoul          #+#    #+#             */
-/*   Updated: 2017/10/31 19:25:41 by tlernoul         ###   ########.fr       */
+/*   Updated: 2017/11/01 19:27:21 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
 
-char	*concaten(char **buffer, t_gnl *gnl)
+int		get_next_line(const int fd, char **line)
 {
-	gnl->save[gnl->fd] = ft_strsub(*buffer, ft_strchr(*buffer, '\n')
-			- *buffer + 1,ft_strclenc(*buffer, '\n', '\0'));
+	char		*buffer;
+	int			end;
+	static char	*save;
 
+	if (fd > MAX_FD || fd < 0 || BUFF_SIZE <= 0 || line == NULL || !(buffer =
+				ft_strnew(BUFF_SIZE + 1)))
+		return (-1);
+	while ((end = read(fd, buffer, BUFF_SIZE) > 0) && !(ft_strchr(buffer, '\n')))
+		*line = ft_strappend(*line, buffer, 1);
+	if (end == -1)
+		return (-1);
+	if (ft_strchr(buffer, '\n'))
+	{
+		*line = ft_strappend(*line, ft_strsub(buffer, 0, ft_strchr(buffer, '\n') - buffer), 1);
+		save = ft_strsub(buffer, ft_strchr(buffer, '\n') - buffer + 1, ft_strclenc(buffer, '\n', '\0'));
+	}
+	else if (end != 0 || buffer)
+		*line = ft_strappend(*line, buffer, 3);
+	return (end || buffer);
 }
 
-int		ft_get_next_line(const int fd, char **line)
+/*int		pseudoget_next_line(const int fd, char **line)
 {
-	static t_gnl	gnl;
-	char			*buffer;
+	Verifier conditions -1 et allouer buffer
+	Remplir buffer avec read
+	si read == -1 : return -1
+	si buffer a '\n'
+		line = buffer jusqu'a '\n' et return 1
+	sinon si read != 0 et buffer existe
+		line = buffer et return 1
+	sinon
+	return 0
+}
 
-	if (fd < 0 || fd > MAX_FD || line == NULL || BUFF_SIZE <= 0 ||
-			BUFF_SIZE > MAX_INT || !(buffer = ft_strnew(BUFF_SIZE + 1)))
-		return (-1);
-	*line = NULL;
-	while ((gnl.end = read(fd, buffer, BUFF_SIZE)) > 0)
+	Remplir buffer avec read
+	Tant que read > 0 && buffer n'a pas de '\n'
+		copier buffer dans line
+*/
+
+#include <fcntl.h>
+int main(int argc, const char *argv[])
+{
+	char	*line;
+	int		fd;
+	int		ret;
+
+	fd = 0;
+	if (argc == 2)
+		fd = open(argv[1], O_RDONLY);
+	while ((ret = get_next_line(fd, &line) > 0))
 	{
-		if (*buffer)
-			*line = ft_strappend(*line, buffer, 'f');
-		if (ft_strchr(buffer, '\n'))
-		{
-			*line = ft_strappend(*line, ft_strsub(buffer, 0,
-						ft_strchr(buffer, '\n') - buffer), 'f');
-			ft_strdel(&buffer);
-			return (1);
-		}
+		ft_putendl("bite");
+		ft_putendl(line);
+		free(line);
 	}
-	return (gnl.end || (line && *line));
+	line = NULL;
+	return 0;
 }
