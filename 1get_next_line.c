@@ -6,7 +6,7 @@
 /*   By: tlernoul <tlernoul@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/24 20:39:50 by tlernoul          #+#    #+#             */
-/*   Updated: 2017/11/01 19:27:21 by tlernoul         ###   ########.fr       */
+/*   Updated: 2017/11/03 17:02:59 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,23 +16,27 @@ int		get_next_line(const int fd, char **line)
 {
 	char		*buffer;
 	int			end;
-	static char	*save;
+	static char	*save = NULL;
 
+	*line = NULL;
 	if (fd > MAX_FD || fd < 0 || BUFF_SIZE <= 0 || line == NULL || !(buffer =
 				ft_strnew(BUFF_SIZE + 1)))
 		return (-1);
+	if (save && *save)
+		*line = ft_strappend(*line, save, 3);
+	ft_strclr(save);
 	while ((end = read(fd, buffer, BUFF_SIZE) > 0) && !(ft_strchr(buffer, '\n')))
 		*line = ft_strappend(*line, buffer, 1);
 	if (end == -1)
 		return (-1);
 	if (ft_strchr(buffer, '\n'))
 	{
-		*line = ft_strappend(*line, ft_strsub(buffer, 0, ft_strchr(buffer, '\n') - buffer), 1);
+		*line = ft_strappend(*line, ft_strsub(buffer, 0, ft_strchr(buffer, '\n') - buffer), 3);
 		save = ft_strsub(buffer, ft_strchr(buffer, '\n') - buffer + 1, ft_strclenc(buffer, '\n', '\0'));
 	}
 	else if (end != 0 || buffer)
 		*line = ft_strappend(*line, buffer, 3);
-	return (end || buffer);
+	return (end || *line);
 }
 
 /*int		pseudoget_next_line(const int fd, char **line)
@@ -65,7 +69,6 @@ int main(int argc, const char *argv[])
 		fd = open(argv[1], O_RDONLY);
 	while ((ret = get_next_line(fd, &line) > 0))
 	{
-		ft_putendl("bite");
 		ft_putendl(line);
 		free(line);
 	}
