@@ -1,66 +1,63 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   1get_next_line.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlernoul <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tlernoul <tlernoul@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/09/20 21:28:37 by tlernoul          #+#    #+#             */
-/*   Updated: 2017/10/24 20:38:06 by tlernoul         ###   ########.fr       */
+/*   Created: 2017/10/24 20:39:50 by tlernoul          #+#    #+#             */
+/*   Updated: 2017/11/03 19:13:19 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdio.h>
 
-void	concaten(char **save, char **line)
-{
-	if (*save)
-	{
-		printf("1===line: %s ||save: %s||\n", *line, *save);
-		*line = ft_strappend(*line, *save, 'n');
-		printf("2===line: %s ||save: %s||\n", *line, *save);
-		ft_strdel(save);
-		printf("3===line: %s ||save: %s||\n", *line, *save);
-	}
-}
-
 int		get_next_line(const int fd, char **line)
 {
-	static char	*save = NULL;
 	char		*buffer;
 	int			end;
+	static char	*save = NULL;
 
 	*line = NULL;
-	buffer = ft_strnew(BUFF_SIZE + 1);
-	while ((end = read(fd, buffer, BUFF_SIZE)) > 0 && (!ft_strchr(buffer, '\n')))
-	{
-		concaten(&save, line);
-		if (buffer[0])
-			*line = ft_strappend(*line, buffer, 'f');
-	}
+	if (fd > MAX_FD || fd < 0 || BUFF_SIZE <= 0 || line == NULL || !(buffer =
+				ft_strnew(BUFF_SIZE + 1)))
+		return (-1);
+	if (save && *save)
+		*line = ft_strappend(*line, save, 1);
+	ft_strclr(save);
+	while ((end = read(fd, buffer, BUFF_SIZE) > 0) && !(ft_strchr(buffer, '\n')))
+		*line = ft_strappend(*line, buffer, 1);
 	if (end == -1)
 		return (-1);
 	if (ft_strchr(buffer, '\n'))
 	{
-		concaten(&save, line);
-		ft_putendl(buffer);
-		*line = ft_strappend(*line, ft_strsub(buffer, 0, ft_strchr(buffer, '\n') - buffer), 'f');
-		printf("%zu\n", ft_strclenc(buffer, '\n', '\0'));
+		*line = ft_strappend(*line, ft_strsub(buffer, 0, ft_strchr(buffer, '\n') - buffer), 3);
 		save = ft_strsub(buffer, ft_strchr(buffer, '\n') - buffer + 1, ft_strclenc(buffer, '\n', '\0'));
-		printf("===line: %s ||save: %s||\n", *line, save);
 	}
-	else if (end)
-		*line = ft_strappend(*line, buffer, 'n');
-	ft_strdel(&buffer);
-	if (!end && save)
-	{
-		concaten(&save, line);
-		return (42);
-	}
-	return (end || (line && line[0]));
+	else if (end != 0 && buffer)
+		*line = ft_strappend(*line, buffer, 3);
+	return (end || *line);
 }
 
+/*int		pseudoget_next_line(const int fd, char **line)
+{
+	Verifier conditions -1 et allouer buffer
+	Remplir buffer avec read
+	si read == -1 : return -1
+	si buffer a '\n'
+		line = buffer jusqu'a '\n' et return 1
+	sinon si read != 0 et buffer existe
+		line = buffer et return 1
+	sinon
+	return 0
+}
+
+	Remplir buffer avec read
+	Tant que read > 0 && buffer n'a pas de '\n'
+		copier buffer dans line
+*/
+/*
 #include <fcntl.h>
 int main(int argc, const char *argv[])
 {
@@ -73,12 +70,9 @@ int main(int argc, const char *argv[])
 		fd = open(argv[1], O_RDONLY);
 	while ((ret = get_next_line(fd, &line) > 0))
 	{
-		//ft_putnbr(ret);
-		//ft_putstr(": ");
 		ft_putendl(line);
-	//	printf("   ||>>  %zu\n",ft_strlen(line));
-		free(line);
+		ft_strdel(&line);
 	}
 	line = NULL;
 	return 0;
-}
+}*/
