@@ -6,11 +6,12 @@
 /*   By: tlernoul <tlernoul@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/24 20:39:50 by tlernoul          #+#    #+#             */
-/*   Updated: 2017/11/03 17:02:59 by tlernoul         ###   ########.fr       */
+/*   Updated: 2017/11/03 17:29:56 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+#include <stdio.h>
 
 int		get_next_line(const int fd, char **line)
 {
@@ -23,7 +24,7 @@ int		get_next_line(const int fd, char **line)
 				ft_strnew(BUFF_SIZE + 1)))
 		return (-1);
 	if (save && *save)
-		*line = ft_strappend(*line, save, 3);
+		*line = ft_strappend(*line, save, 1);
 	ft_strclr(save);
 	while ((end = read(fd, buffer, BUFF_SIZE) > 0) && !(ft_strchr(buffer, '\n')))
 		*line = ft_strappend(*line, buffer, 1);
@@ -36,7 +37,9 @@ int		get_next_line(const int fd, char **line)
 	}
 	else if (end != 0 || buffer)
 		*line = ft_strappend(*line, buffer, 3);
-	return (end || *line);
+	/*if (!(end || (*save && *line)))
+		printf("buff='%s' || save ='%s' || end='%d'\n", buffer, save, end);*/
+	return (end || (*save && *line));
 }
 
 /*int		pseudoget_next_line(const int fd, char **line)
