@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   1get_next_line.c                                   :+:      :+:    :+:   */
+/*    get_next_line.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tlernoul <tlernoul@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/24 20:39:50 by tlernoul          #+#    #+#             */
-/*   Updated: 2017/11/03 19:13:19 by tlernoul         ###   ########.fr       */
+/*   Updated: 2017/11/05 15:29:02 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,49 +15,36 @@
 
 int		get_next_line(const int fd, char **line)
 {
-	char		*buffer;
+	char		*buf;
 	int			end;
 	static char	*save = NULL;
 
 	*line = NULL;
-	if (fd > MAX_FD || fd < 0 || BUFF_SIZE <= 0 || line == NULL || !(buffer =
-				ft_strnew(BUFF_SIZE + 1)))
+	if (fd > MAX_FD || fd < 0 || BUFF_SIZE <= 0 || line == NULL || !(buf =
+				ft_strnew(BUFF_SIZE)))
 		return (-1);
 	if (save && *save)
 		*line = ft_strappend(*line, save, 1);
-	ft_strclr(save);
-	while ((end = read(fd, buffer, BUFF_SIZE) > 0) && !(ft_strchr(buffer, '\n')))
-		*line = ft_strappend(*line, buffer, 1);
+	ft_strdel(&save);
+	while (((end = read(fd, buf, BUFF_SIZE)) > 0) && !(ft_strchr(buf, '\n')))
+	{
+		//printf("===buf:'%s'||line:'%s'||save:'%s'||end=%d\n",buf,*line,save, end);
+		printf("===%s===%d=\n",buf,end);
+		*line = ft_strappend(*line, buf, 1);
+	}
+		printf("===%s===%d=\n",buf,end);
 	if (end == -1)
 		return (-1);
-	if (ft_strchr(buffer, '\n'))
+	if (ft_strchr(buf, '\n'))
 	{
-		*line = ft_strappend(*line, ft_strsub(buffer, 0, ft_strchr(buffer, '\n') - buffer), 3);
-		save = ft_strsub(buffer, ft_strchr(buffer, '\n') - buffer + 1, ft_strclenc(buffer, '\n', '\0'));
+		*line = ft_strappend(*line, ft_strsub(buf, 0, ft_strchr(buf, '\n') - buf), 3);
+		save = ft_strsub(buf, ft_strchr(buf, '\n') - buf + 1, ft_strclenc(buf, '\n', '\0'));
 	}
-	else if (end != 0 && buffer)
-		*line = ft_strappend(*line, buffer, 3);
+	else if (end != 0 && buf)
+		*line = ft_strappend(*line, buf, 3);
 	return (end || *line);
 }
 
-/*int		pseudoget_next_line(const int fd, char **line)
-{
-	Verifier conditions -1 et allouer buffer
-	Remplir buffer avec read
-	si read == -1 : return -1
-	si buffer a '\n'
-		line = buffer jusqu'a '\n' et return 1
-	sinon si read != 0 et buffer existe
-		line = buffer et return 1
-	sinon
-	return 0
-}
-
-	Remplir buffer avec read
-	Tant que read > 0 && buffer n'a pas de '\n'
-		copier buffer dans line
-*/
-/*
 #include <fcntl.h>
 int main(int argc, const char *argv[])
 {
@@ -75,4 +62,4 @@ int main(int argc, const char *argv[])
 	}
 	line = NULL;
 	return 0;
-}*/
+}
