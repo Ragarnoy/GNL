@@ -6,12 +6,42 @@
 /*   By: tlernoul <tlernoul@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/24 20:39:50 by tlernoul          #+#    #+#             */
-/*   Updated: 2017/11/05 15:29:02 by tlernoul         ###   ########.fr       */
+/*   Updated: 2017/11/08 18:38:09 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdio.h>
+/*
+int		testget_next_line(const int fd, char **line)
+{
+	char		*buf;
+	int			end;
+	static char	*save = NULL;
+
+	if (fd > MAX_FD || fd < 0 || BUFF_SIZE <= 0 || line == NULL || !(buf =
+				ft_strnew(BUFF_SIZE)))
+		return (-1);
+	if (save && *save)
+		*line = ft_strappend(*line, save, 1);
+	while (((end = read(fd, buf, BUFF_SIZE)) > 0) && !(ft_strchr(save, '\n')))
+	{
+		//printf("===buf:'%s'||line:'%s'||save:'%s'||end=%d\n",buf,*line,save, end);
+		printf("===%s===%d=\n",buf,end);
+		*save = ft_strappend(save, buf, 1);
+	}
+}
+
+Check -1
+
+Tant que !\n dans save ou read
+	read dans BUF
+	buf dans save
+Check read-1
+Append de save dans line jusqu'a \n
+strsub de \n + 1 a \0
+*/
+
 
 int		get_next_line(const int fd, char **line)
 {
@@ -21,28 +51,22 @@ int		get_next_line(const int fd, char **line)
 
 	*line = NULL;
 	if (fd > MAX_FD || fd < 0 || BUFF_SIZE <= 0 || line == NULL || !(buf =
-				ft_strnew(BUFF_SIZE)))
+				ft_strnew(BUFF_SIZE)) || !(save = ft_strnew(BUFF_SIZE)))
 		return (-1);
-	if (save && *save)
-		*line = ft_strappend(*line, save, 1);
-	ft_strdel(&save);
-	while (((end = read(fd, buf, BUFF_SIZE)) > 0) && !(ft_strchr(buf, '\n')))
+	while (((end = read(fd, buf, BUFF_SIZE)) > 0) && !(ft_strchr(save, '\n')))
 	{
-		//printf("===buf:'%s'||line:'%s'||save:'%s'||end=%d\n",buf,*line,save, end);
-		printf("===%s===%d=\n",buf,end);
-		*line = ft_strappend(*line, buf, 1);
+		save = ft_strappend(save, buf, 1);
 	}
-		printf("===%s===%d=\n",buf,end);
 	if (end == -1)
 		return (-1);
+	*line = (ft_strchr(save, '\n') ? ft_strappend(*line, ft_strsub(save, 0,
+			ft_strchr(save, '\n') - save), 3) : ft_strappend(*line, save, 1));
 	if (ft_strchr(buf, '\n'))
-	{
-		*line = ft_strappend(*line, ft_strsub(buf, 0, ft_strchr(buf, '\n') - buf), 3);
 		save = ft_strsub(buf, ft_strchr(buf, '\n') - buf + 1, ft_strclenc(buf, '\n', '\0'));
-	}
 	else if (end != 0 && buf)
 		*line = ft_strappend(*line, buf, 3);
-	return (end || *line);
+	printf("%s\n",*line);
+	return (end/* || *line*/);
 }
 
 #include <fcntl.h>
