@@ -6,7 +6,7 @@
 /*   By: tlernoul <tlernoul@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/24 20:39:50 by tlernoul          #+#    #+#             */
-/*   Updated: 2017/11/08 18:38:09 by tlernoul         ###   ########.fr       */
+/*   Updated: 2017/11/10 20:06:49 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,22 +51,24 @@ int		get_next_line(const int fd, char **line)
 
 	*line = NULL;
 	if (fd > MAX_FD || fd < 0 || BUFF_SIZE <= 0 || line == NULL || !(buf =
-				ft_strnew(BUFF_SIZE)) || !(save = ft_strnew(BUFF_SIZE)))
+				ft_strnew(BUFF_SIZE)))
 		return (-1);
+	if (!save)
+		save = ft_strnew(BUFF_SIZE);
 	while (((end = read(fd, buf, BUFF_SIZE)) > 0) && !(ft_strchr(save, '\n')))
 	{
-		save = ft_strappend(save, buf, 1);
+		save = ft_strappend(save, buf, 0);
 	}
 	if (end == -1)
 		return (-1);
 	*line = (ft_strchr(save, '\n') ? ft_strappend(*line, ft_strsub(save, 0,
 			ft_strchr(save, '\n') - save), 3) : ft_strappend(*line, save, 1));
-	if (ft_strchr(buf, '\n'))
-		save = ft_strsub(buf, ft_strchr(buf, '\n') - buf + 1, ft_strclenc(buf, '\n', '\0'));
-	else if (end != 0 && buf)
+	if (ft_strchr(save, '\n'))
+		ft_strcpy(save, ft_strchr(save, '\n') + 1);
+	if (end != 0 && buf && !ft_strchr(save, '\n'))
 		*line = ft_strappend(*line, buf, 3);
-	printf("%s\n",*line);
-	return (end/* || *line*/);
+//printf("1===%s===\n2===%s===\n",*line,save);
+	return (end);
 }
 
 #include <fcntl.h>
