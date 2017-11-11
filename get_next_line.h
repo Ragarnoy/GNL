@@ -6,13 +6,13 @@
 /*   By: tlernoul <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/20 21:21:51 by tlernoul          #+#    #+#             */
-/*   Updated: 2017/11/05 13:19:32 by tlernoul         ###   ########.fr       */
+/*   Updated: 2017/11/11 18:09:12 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
-# define BUFF_SIZE 10
+# define BUFF_SIZE 100
 # define MAX_FD 7168
 # define MAX_INT 2147483647
 
