@@ -1,17 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*    get_next_line.c                                   :+:      :+:    :+:   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tlernoul <tlernoul@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/24 20:39:50 by tlernoul          #+#    #+#             */
-/*   Updated: 2017/11/12 20:07:25 by tlernoul         ###   ########.fr       */
+/*   Updated: 2017/11/13 16:27:31 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
 
 char	**multi_fd(int fd)
 {
@@ -39,24 +38,21 @@ int		get_next_line(const int fd, char **line)
 	char		**save;
 
 	end = -2;
-	if (fd > MAX_FD || fd < 0 || BUFF_SIZE <= 0 || line == NULL || !(buf =
-				ft_strnew(BUFF_SIZE)))
+	if (fd > MAX_FD || fd < 0 || BUFF_SIZE <= 0 || line == NULL ||
+		!(buf = ft_strnew(BUFF_SIZE)))
 		return (-1);
-	*line = NULL;
 	save = multi_fd(fd);
-//printf("###########\n0line===%s===\nsave ===%s===\n",*line,*save);
-	while (!(ft_strchr(*save, '\n')) && ((end = read(fd, buf, BUFF_SIZE)) > 0) && *buf)
+	while (!(ft_strchr(*save, '\n')) && ((end = read(fd, buf, BUFF_SIZE)) > 0))
 	{
 		*save = ft_strappend(*save, buf, 1);
 		ft_strclr(buf);
 	}
 	if (end == -1)
 		return (-1);
-*line = (ft_strchr(*save, '\n') ? ft_strappend(*line, ft_strsub(*save, 0, ft_strchr(*save, '\n') - *save), 3) : ft_strappend(*line, *save, 1));
-//printf("1line===%s===\nsave ===%s===\n",*line,*save);
+	*line = (ft_strchr(*save, '\n') ?
+		ft_strsub(*save, 0, ft_strchr(*save, '\n') - *save) : ft_strdup(*save));
 	if (ft_strchr(*save, '\n'))
 		ft_strcpy(*save, ft_strchr(*save, '\n') + 1);
-//printf("2line===%s===\nsave ===%s===\n###########\n\n",*line,*save);
 	if (!end)
 		ft_strclr(*save);
 	ft_strdel(&buf);
